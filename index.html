@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <form id="mForm">
+    <section id="dialogue"></section>
+    <input type="text" id="text" name="text" placeholder="Type something...">
+    <button type="submit">Submit</button>
+  </form>
+</body>
+
+<script>
+  const username = new URLSearchParams(window.location.search).get("name");
+  const socket = new WebSocket(`ws://localhost:3001?name=${username}`);
+  // socket.addEventListener("message", event => {
+  //   console.log(event.data, 'socket data');
+  //   appendMessage(event.data);
+  // });
+  // http://localhost:3000/chat?name=teagan
+
+  socket.onmessage = ({ data }) => {
+    console.log(data, 'socket data');
+    appendMessage(data);
+  };
+
+  document.getElementById('mForm').addEventListener('submit', (eventObj) => {
+    eventObj.preventDefault();
+    const formData = new FormData(eventObj.target);
+    socket.send(formData.get("text"));
+    formData.set("text", "");
+  });
+
+  function appendMessage(message) {
+    const dialogue = document.getElementById('dialogue');
+    const p = document.createElement('p');
+    p.textContent = message;
+    dialogue.appendChild(p);
+  }
+
+</script>
+
+</html>
